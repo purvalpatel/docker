@@ -1,3 +1,11 @@
+# Setup Docker-Desktop
+```
+sudo apt remove docker docker-engine docker.io containerd runc -y
+wget https://desktop.docker.com/linux/main/amd64/docker-desktop-amd64.deb
+sudo dpkg -i docker-desktop-amd64.deb
+systemctl --user start docker-desktop
+systemctl --user enable docker-desktop
+```
 # Docker Cheat Sheet
 
 **Want to improve this cheat sheet?  See the [Contributing](#contributing) section!**
