@@ -6,6 +6,15 @@ sudo dpkg -i docker-desktop-amd64.deb
 systemctl --user start docker-desktop
 systemctl --user enable docker-desktop
 ```
+Add user to group:
+```
+sudo usermod -aG docker $USER
+newgrp docker
+```
+Verify Docker engine
+```
+docker info | grep -i "Docker Desktop"
+```
 # Docker Cheat Sheet
 
 **Want to improve this cheat sheet?  See the [Contributing](#contributing) section!**
