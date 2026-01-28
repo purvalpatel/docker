@@ -4,4 +4,14 @@ DCT ( Docker Content Trust )
 - hese signatures allow client-side or runtime verification of the integrity and publisher of specific image tags.
 <br>
 
-**Through DCT, image publishers can sign their images and image consumers can ensure that the images they pull are signed.**
+**Through DCT, image publishers can sign their images and image consumers can ensure that the images they pull are signed.** <br>
+**Verify that Docker image is not tempared.**
+
+Generate key:
+```
+docker trust key generate jeff
+```
+Or Use existing key:
+```
+docker trust key load key.pem --name jeff
+```
