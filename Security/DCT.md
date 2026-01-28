@@ -19,3 +19,18 @@ Or Use existing key:
 ```
 docker trust key load key.pem --name jeff
 ```
+### Enable it:
+
+Only pull signed image. <br>
+With DCT.
+```
+export DOCKER_CONTENT_TRUST=1
+docker pull nginx:latest
+```
+
+### Disable it:
+Without DCT
+```
+docker pull nginx:latest
+export DOCKER_CONTENT_TRUST=0
+```
