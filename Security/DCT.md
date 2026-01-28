@@ -5,7 +5,11 @@ DCT ( Docker Content Trust )
 <br>
 
 **Through DCT, image publishers can sign their images and image consumers can ensure that the images they pull are signed.** <br>
-**Verify that Docker image is not tempared.**
+**Verify that Docker image is not tempared.** <br>
+<br>
+**It ensures:**
+- The image really comes from who you expect
+- The image was not changed after it was built
 
 Generate key:
 ```
