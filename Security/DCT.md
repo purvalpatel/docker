@@ -34,3 +34,7 @@ Without DCT
 docker pull nginx:latest
 export DOCKER_CONTENT_TRUST=0
 ```
+Remove the trust from the image:
+```
+docker trust revoke registry.example.com/admin/demo:1
+```
