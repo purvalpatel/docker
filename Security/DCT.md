@@ -34,6 +34,19 @@ Without DCT
 docker pull nginx:latest
 export DOCKER_CONTENT_TRUST=0
 ```
+
+Generate key:
+```
+docker trust key generate jeff
+```
+Add this new created sign to image:
+```
+docker trust signer add --key cert.pem jeff registry.example.com/admin/demo
+```
+Sign the trust data to image tag:
+```
+docker trust sign registry.example.com/admin/demo:1
+```
 Remove the trust from the image:
 ```
 docker trust revoke registry.example.com/admin/demo:1
