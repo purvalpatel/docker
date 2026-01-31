@@ -39,7 +39,17 @@ trivy config .
 
 With Docker:
 ```
-docker run --rm   -v k8s:/workspace   aquasec/trivy:latest   config /workspace
+docker run --rm \
+  -v $(pwd)/k8s:/workspace \
+  aquasec/trivy:latest \
+  config /workspace
+
+OR
+
+docker run --rm \
+  -v $(pwd)/k8s:/workspace \
+  aquasec/trivy:latest \
+  config /workspace --severity LOW,HIGH,CRITICAL
 ```
 
 ### 4. Scan a Running Kubernetes Cluster
