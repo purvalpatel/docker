@@ -1,3 +1,154 @@
-# Private Docker Registry
-
+Prrivate Docker registry like dockerhub.
 ## Setup: Quay
+
+Setup with Docker:
+----------------
+docker-compose.yaml
+```
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:10.12
+    container_name: postgresql
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: quay
+      POSTGRES_USER: quayuser
+      POSTGRES_PASSWORD: quaypass
+    ports:
+      - "5433:5432"
+    volumes:
+      - ./postgresql-backup/postgres:/var/lib/postgresql/data
+
+  redis:
+    image: redis:5.0.7
+    container_name: redis
+    restart: unless-stopped
+    command: ["redis-server", "--requirepass", "strongpassword"]
+    #ports:
+    #  - "6379:6379"
+    volumes:
+      - ./redis-backup/_data:/data
+
+  quay:
+    image: quay.io/projectquay/quay:latest
+    container_name: quay
+    restart: unless-stopped
+    privileged: true
+    ports:
+      - "8083:8080"
+    environment:
+      DATABASE_SERVICE_NAME: postgresql
+      DATABASE_NAME: quay
+      DATABASE_USERNAME: quayuser
+      DATABASE_PASSWORD: quaypass
+      DATABASE_HOST: postgres
+      DATABASE_PORT: 5432
+      REDIS_HOST: redis
+      REDIS_PASSWORD: redispass
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./config-backup/config:/conf/stack
+      - ./storage:/datastorage
+```
+
+## How to create user:
+1. Open login page of Quay:
+2. Click on create account
+![alt text](Images/q-image.png)
+3. Fill the details and account is created.
+
+
+## Provide Access to the repository to other users:
+1. Login Quay
+2. Navigate to Organization -> Teams and Membership -> Click on "Owners"
+![alt text](Images/q-image-2.png)
+3. Provide permission of Oraganization to user
+4. Repository
+5. Settings -> Select User and Provide permissions
+![alt text](Images/q-image-1.png)
+
+Use Robot account
+-------------
+
+1. Login Quay registry -> Organization
+2. Navigate to "Robot Accounts"
+3. Create Robot Account
+4. View it and save username and password.
+
+If want to use it in docker then use that username and password. <br>
+If want to use it in kubernetes then there is a help of it use it. <br>
+
+![alt text](Images/qd-image.png)
+
+
+Troubleshooting:
+----------------
+## Issue 1 : 
+
+When user is trying to login it is showing error message <br>
+"**Too many attempts have been made to login. Please try again in 887 seconds.**"
+
+**Reason:**<br>
+So many failed login attempt have been made and due to this account is locked. <br>
+
+<br>
+You will get configurations from `config-backup/config/config.yaml` <br>
+<br>
+
+### Login postgres
+```
+# connect container:
+docker exec -it postgresql bash
+
+# Login postgres
+psql postgresql://user:pass@postgresql/quay
+
+# connect database
+\c quay
+
+# list tables
+\dt
+```
+
+### Verify failed attempt:
+```
+SELECT
+  username,
+  enabled,
+  invalid_login_attempts,
+  last_invalid_login
+FROM "user"
+WHERE username = 'harshal';
+```
+
+### update failed attempt:
+```
+UPDATE "user"
+SET
+  invalid_login_attempts = 0,
+  last_invalid_login = now() - interval '365 days',
+  enabled = true
+WHERE username = 'harshal';
+```
+
+## Issue 2 : Change password from backend:
+
+### Generate Password HASH.
+```
+docker exec -it quay-app python3 - <<'EOF'
+from bcrypt import hashpw, gensalt
+print(hashpw(b"NewPassword123", gensalt()).decode())
+EOF
+```
+
+### Then login postgres:
+Connect postgres database same as above.
+```
+UPDATE "user"
+SET password_hash = '<NEW_BCRYPT_HASH>'
+WHERE username = '<username>';
+```
